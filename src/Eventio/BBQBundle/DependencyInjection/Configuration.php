@@ -21,12 +21,14 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('id')
                     ->defaultValue(array(
                         'default' => array(
-                            'host' => '127.0.0.1'
+                            'host' => '127.0.0.1',
+                            'port' => '11300',
                         )
                     ))
                     ->prototype('array')
                         ->children()
                             ->scalarNode('host')->end()
+                            ->scalarNode('port')->end()
                         ->end()
                     ->end()
                 ->end()

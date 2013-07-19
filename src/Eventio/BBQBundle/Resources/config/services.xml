@@ -1,18 +1,13 @@
 <?xml version="1.0" ?>
-
 <container xmlns="http://symfony.com/schema/dic/services"
-		   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		   xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
-
-	<parameters>
-		<parameter key="pheanstalk.connections.default.host">127.0.0.1</parameter>
-        <parameter key="eventio_bbq.defaults.pheanstalk.class">Pheanstalk_Pheanstalk</parameter>
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <parameters>
         <parameter key="eventio_bbq.defaults.queue.pheanstalk.class">Eventio\BBQ\Queue\PheanstalkTubeQueue</parameter>
-        
         <parameter key="eventio_bbq.defaults.queue.directory.class">Eventio\BBQ\Queue\DirectoryQueue</parameter>
-	</parameters>
+    </parameters>
     
-	<services>
-		<service id="eventio_bbq" class="Eventio\BBQ"></service>
-	</services>
+    <services>
+        <service id="eventio_bbq" class="Eventio\BBQ"></service>
+    </services>
 </container>

@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DispatchJobAsEventCommand extends ContainerAwareCommand {
+class DispatchJobAsEventCommand extends BBQCommand {
 
     /**
      * @see Command
@@ -33,40 +33,23 @@ class DispatchJobAsEventCommand extends ContainerAwareCommand {
         $payload = unserialize(file_get_contents($stream));
         $queue = $input->getOption('originQueue');
 
-        $event = new HandleJobEvent($payload, $queue);
+        $this->log()->debug('New job received from the queue ' . $queue);
 
         $dispatcher = $this->getContainer()->get('event_dispatcher');
-        
+
         if ($payload instanceof EventPayload) {
+            $this->log()->debug('Dispatching EventPayload. Event name: ' . $payload->getEventName());
             $dispatcher->dispatch($payload->getEventName(), $payload->getEventObject());
         } else {
+            $event = new HandleJobEvent($payload, $queue);
+
+            $this->log()->debug('Dispatching as HandleJobEvent.');
             $dispatcher->dispatch('eventio_bbq.handle_job', $event);
             $dispatcher->dispatch('eventio_bbq.handle_job.' . $queue, $event);
         }
-        
+
         $output->write('OK');
         return;
-    }
-
-    protected function logDebug($message) {
-        $logger = $this->getContainer()->get('logger');
-        if ($logger) {
-            $logger->debug($message);
-        }
-    }
-
-    protected function logInfo($message) {
-        $logger = $this->getContainer()->get('logger');
-        if ($logger) {
-            $logger->info($message);
-        }
-    }
-
-    protected function logError($message) {
-        $logger = $this->getContainer()->get('logger');
-        if ($logger) {
-            $logger->err($message);
-        }
     }
 
 }

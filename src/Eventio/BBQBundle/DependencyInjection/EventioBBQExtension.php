@@ -16,6 +16,7 @@ class EventioBBQExtension extends Extension
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.xml');
+        $loader->load('pheanstalk.xml');
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -38,7 +39,7 @@ class EventioBBQExtension extends Extension
         foreach ($config as $connectionId => $connectionConfig) {
             $definition = new \Symfony\Component\DependencyInjection\Definition();
             $definition->setClass($container->getParameter('eventio_bbq.defaults.pheanstalk.class'));
-            $definition->setArguments(array($connectionConfig['host']));
+            $definition->setArguments(array($connectionConfig['host'], $connectionConfig['port']));
 
             $container->setDefinition(sprintf('eventio_bbq.pheanstalk.%s', $connectionId), $definition);
         }
