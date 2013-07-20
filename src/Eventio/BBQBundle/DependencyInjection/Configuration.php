@@ -32,6 +32,23 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('predis_clients')
+                    ->useAttributeAsKey('id')
+                    ->defaultValue(array(
+                        'default' => array(
+                            'params' => 'tcp://127.0.0.1:6379',
+                            'options' => array(),
+                        )
+                    ))
+                    ->prototype('array')
+                        ->children()
+                            ->variableNode('params')->end()
+                            ->variableNode('options')
+                                ->defaultValue(null)
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;

@@ -17,12 +17,16 @@ class EventioBBQExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.xml');
         $loader->load('pheanstalk.xml');
+        $loader->load('predis.xml');
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
         if ($config['pheanstalk_connections']) {
             $this->loadPheanstalk($container, $config['pheanstalk_connections']);
+        }
+        if ($config['predis_clients']) {
+            $this->loadPredis($container, $config['predis_clients']);
         }
         if ($config['queues']) {
             $this->loadQueues($container, $config['queues']);
@@ -45,6 +49,17 @@ class EventioBBQExtension extends Extension
         }
     }
 
+    private function loadPredis(ContainerBuilder $container, $config)
+    {
+        foreach ($config as $connectionId => $connectionConfig) {
+            $definition = new \Symfony\Component\DependencyInjection\Definition();
+            $definition->setClass($container->getParameter('eventio_bbq.defaults.predis.class'));
+            $definition->setArguments(array($connectionConfig['params'], $connectionConfig['options']));
+
+            $container->setDefinition(sprintf('eventio_bbq.predis.%s', $connectionId), $definition);
+        }
+    }
+
     private function loadQueues(ContainerBuilder $container, $config)
     {
         foreach ($config as $queueId => $queueConfig) {
@@ -59,6 +74,18 @@ class EventioBBQExtension extends Extension
                 $definition = new \Symfony\Component\DependencyInjection\Definition();
                 $definition->setClass($container->getParameter('eventio_bbq.defaults.queue.pheanstalk.class'));
                 $definition->setArguments(array($queueId, $container->getDefinition(sprintf('eventio_bbq.pheanstalk.%s', $pheanstalkId)), $queueConfig['tube']));
+            } elseif ($type == 'predis') {
+                $pheanstalkId = array_key_exists('predis_id', $queueConfig) ? $queueConfig['predis_id'] : 'default';
+                if (!array_key_exists('key', $queueConfig)) {
+                    throw new \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException('Queue configuration "' . $queueId . '" does not have a key.');
+                }
+                if (!array_key_exists('config', $queueConfig) || !is_array($queueConfig['config'])) {
+                    $queueConfig['config'] = array();
+                }
+
+                $definition = new \Symfony\Component\DependencyInjection\Definition();
+                $definition->setClass($container->getParameter('eventio_bbq.defaults.queue.predis.class'));
+                $definition->setArguments(array($queueId, $container->getDefinition(sprintf('eventio_bbq.predis.%s', $pheanstalkId)), $queueConfig['key'], $queueConfig['config']));
             } elseif ($type == 'directory') {
                 $definition = new \Symfony\Component\DependencyInjection\Definition();
                 $definition->setClass($container->getParameter('eventio_bbq.defaults.queue.directory.class'));
