@@ -101,8 +101,8 @@ class HandleQueueCommand extends BBQCommand {
                     // Process should end with a proper exit code if everything goes well
                     if (false === $process->isSuccessful()) {
                         $this->verboseWrite(2, 'Process (' . $processCommand . ') execution failed.');
-                        $this->log()->error(sprintf("Job execution failed. Queue '%s', job payload '%s'.", $queue->getId(), $jobPayload));
-                        $this->log()->error(sprintf("Error output: %s", $process->getErrorOutput()));
+                        $this->log()->err(sprintf("Job execution failed. Queue '%s', job payload '%s'.", $queue->getId(), $jobPayload));
+                        $this->log()->err(sprintf("Error output: %s", $process->getErrorOutput()));
                         $this->verboseWrite(6, 'Process error output: ' . $process->getErrorOutput());
                     } else {
                         $output = $process->getOutput();
