@@ -2,7 +2,7 @@
 
 namespace Eventio\BBQBundle\Job\Payload;
 
-use Eventio\BBQ\Job\Payload\JsonSerializedPayload;
+use Eventio\BBQ\Job\Payload\JobPayloadInterface;
 
 /**
  * This payload wraps a Symfony2 event name and object, and
@@ -10,7 +10,7 @@ use Eventio\BBQ\Job\Payload\JsonSerializedPayload;
  *
  * @author Ville Mattila <ville@eventio.fi>
  */
-class EventPayload extends JsonSerializedPayload
+class EventPayload implements JobPayloadInterface
 {
     protected $eventName;
     
@@ -35,5 +35,14 @@ class EventPayload extends JsonSerializedPayload
 
     public function setEventObject($eventObject) {
         $this->eventObject = $eventObject;
+    }
+    
+    public function serialize() {
+        return serialize(array('n' => $this->eventName,'o' => $this->eventObject));
+    }
+    public function unserialize($serialized) {
+        $serializedArray = unserialize($serialized);
+        $this->eventName = $serializedArray['n'];
+        $this->eventObject = $serializedArray['o'];
     }
 }

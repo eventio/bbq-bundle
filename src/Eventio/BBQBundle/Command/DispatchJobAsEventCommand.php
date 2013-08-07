@@ -4,7 +4,7 @@ namespace Eventio\BBQBundle\Command;
 
 use Eventio\BBQBundle\Event\HandleJobEvent;
 use Eventio\BBQBundle\Job\Payload\EventPayload;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
